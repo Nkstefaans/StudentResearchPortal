@@ -1,0 +1,209 @@
+/* Custom styles for the Student Research Management System */
+
+/* Main container padding for better readability */
+.container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Form styling */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard card styling */
+.dashboard-card {
+    height: 100%;
+    transition: transform 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Thesis status badges */
+.status-badge {
+    font-size: 0.9rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-submitted {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.status-nomination {
+    background-color: var(--bs-info);
+    color: white;
+}
+
+.status-approved {
+    background-color: var(--bs-success);
+    color: white;
+}
+
+.status-review {
+    background-color: var(--bs-warning);
+    color: black;
+}
+
+.status-completed {
+    background-color: var(--bs-secondary);
+    color: white;
+}
+
+/* Timeline styling */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: var(--bs-info);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: var(--bs-info);
+}
+
+/* Notification badge */
+.notification-badge {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-badge[data-count]:after {
+    content: attr(data-count);
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 0.7rem;
+    background-color: var(--bs-danger);
+    color: white;
+    border-radius: 50%;
+    padding: 0.25rem 0.5rem;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1rem;
+    text-align: center;
+}
+
+/* Role specific coloring */
+.role-student {
+    border-left: 4px solid var(--bs-primary);
+}
+
+.role-lecturer {
+    border-left: 4px solid var(--bs-info);
+}
+
+.role-examiner {
+    border-left: 4px solid var(--bs-warning);
+}
+
+.role-postgrad {
+    border-left: 4px solid var(--bs-success);
+}
+
+.role-admin {
+    border-left: 4px solid var(--bs-danger);
+}
+
+/* Deadline styling */
+.deadline-approaching {
+    color: var(--bs-warning);
+}
+
+.deadline-overdue {
+    color: var(--bs-danger);
+}
+
+/* File upload styling */
+.custom-file-upload {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px dashed var(--bs-secondary);
+    border-radius: 0.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.custom-file-upload:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--bs-primary);
+}
+
+/* User profile card */
+.profile-card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.profile-header {
+    padding: 1.5rem;
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.profile-body {
+    padding: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .timeline {
+        padding-left: 1.5rem;
+    }
+    
+    .timeline-item::before {
+        left: -1.5rem;
+    }
+    
+    .form-container {
+        padding: 1rem;
+    }
+}
+
+/* Print style adjustments */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        font-size: 12pt;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 100%;
+    }
+}

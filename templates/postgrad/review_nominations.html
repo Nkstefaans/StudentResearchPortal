@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block title %}Review Examiner Nominations - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('postgrad_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Review Nominations</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Review Examiner Nominations</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h3>{{ thesis.title }}</h3>
+                            <p class="text-muted">
+                                Student: {{ thesis.student.user.first_name }} {{ thesis.student.user.last_name }} 
+                                ({{ thesis.student.degree_type }})
+                            </p>
+                            <p class="text-muted">
+                                Supervisor: {{ thesis.supervisor.title }} {{ thesis.supervisor.user.first_name }} {{ thesis.supervisor.user.last_name }}
+                                ({{ thesis.supervisor.department }})
+                            </p>
+                            <div class="mb-3">
+                                <h5>Abstract</h5>
+                                <p>{{ thesis.abstract }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-info">
+                                <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i> Nomination Requirements</h5>
+                                <p>For {{ thesis.student.degree_type }} thesis:</p>
+                                <ul class="mb-0">
+                                    <li>{{ "4 examiners" if thesis.student.degree_type == 'PhD' else "3 examiners" }}</li>
+                                    <li>Different institutions</li>
+                                    <li>Relevant expertise</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('review_nominations', thesis_id=thesis.id) }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Nominated Examiners</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 5%">Approve</th>
+                                                <th>Name</th>
+                                                <th>Institution</th>
+                                                <th>Expertise</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for nomination_id, field_name, examiner in nomination_fields %}
+                                                <tr>
+                                                    <td>
+                                                        {% set field = form[field_name] %}
+                                                        {{ field(class="form-check-input") }}
+                                                    </td>
+                                                    <td>{{ examiner.title }} {{ examiner.user.first_name }} {{ examiner.user.last_name }}</td>
+                                                    <td>{{ examiner.institution }}</td>
+                                                    <td>{{ examiner.expertise }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.comments.label(class="form-label") }}
+                            {{ form.comments(class="form-control", rows=3, placeholder="Optional comments about your decision") }}
+                            <div class="form-text">
+                                Add any comments about your approval or rejection of the nominated examiners.
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('postgrad_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i> Approval Guidelines</h5>
+                    <ul class="mb-0">
+                        <li><strong>Institution Diversity:</strong> Examiners should be from different institutions to avoid conflicts of interest.</li>
+                        <li><strong>Expertise Match:</strong> Examiners should have expertise relevant to the thesis topic.</li>
+                        <li><strong>Qualifications:</strong> Examiners should hold appropriate qualifications (typically PhD and academic position).</li>
+                        <li><strong>No Conflicts:</strong> Ensure no recent collaborations or conflicts of interest exist between examiners and the supervisor or student.</li>
+                        <li><strong>Sufficient Number:</strong> {{ thesis.student.degree_type }} thesis requires {{ "4" if thesis.student.degree_type == 'PhD' else "3" }} examiners.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

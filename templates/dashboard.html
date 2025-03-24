@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-0">Welcome, {{ current_user.first_name }} {{ current_user.last_name }}</h2>
+                    <p class="text-muted">{{ current_user.role.replace('_', ' ').title() }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12 text-center py-5">
+            <h3 class="mb-4">Redirecting to your role-specific dashboard...</h3>
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">If you are not redirected automatically, please click the appropriate link below:</p>
+            
+            <div class="d-flex justify-content-center mt-3">
+                {% if current_user.role == 'student' %}
+                    <a href="{{ url_for('student_dashboard') }}" class="btn btn-primary">Go to Student Dashboard</a>
+                {% elif current_user.role == 'lecturer' %}
+                    <a href="{{ url_for('lecturer_dashboard') }}" class="btn btn-primary">Go to Lecturer Dashboard</a>
+                {% elif current_user.role == 'examiner' %}
+                    <a href="{{ url_for('examiner_dashboard') }}" class="btn btn-primary">Go to Examiner Dashboard</a>
+                {% elif current_user.role == 'postgrad_office' %}
+                    <a href="{{ url_for('postgrad_dashboard') }}" class="btn btn-primary">Go to Postgraduate Office Dashboard</a>
+                {% elif current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">Go to Admin Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Redirect to role-specific dashboard after 1 second
+        setTimeout(function() {
+            {% if current_user.role == 'student' %}
+                window.location.href = "{{ url_for('student_dashboard') }}";
+            {% elif current_user.role == 'lecturer' %}
+                window.location.href = "{{ url_for('lecturer_dashboard') }}";
+            {% elif current_user.role == 'examiner' %}
+                window.location.href = "{{ url_for('examiner_dashboard') }}";
+            {% elif current_user.role == 'postgrad_office' %}
+                window.location.href = "{{ url_for('postgrad_dashboard') }}";
+            {% elif current_user.role == 'admin' %}
+                window.location.href = "{{ url_for('admin_dashboard') }}";
+            {% endif %}
+        }, 1000);
+    });
+</script>
+{% endblock %}

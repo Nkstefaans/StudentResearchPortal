@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+
+{% block title %}Submit Thesis - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('student_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Submit Thesis</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Submit Thesis or Dissertation</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('submit_thesis') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            {{ form.title.label(class="form-label") }}
+                            {% if form.title.errors %}
+                                {{ form.title(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.title(class="form-control", placeholder="Enter the title of your thesis") }}
+                                <div class="form-text">Choose a clear, concise title that accurately reflects your research.</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.abstract.label(class="form-label") }}
+                            {% if form.abstract.errors %}
+                                {{ form.abstract(class="form-control is-invalid", rows=6) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.abstract.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.abstract(class="form-control", rows=6, placeholder="Provide a brief summary of your research") }}
+                                <div class="form-text">Your abstract should be a brief summary (250-500 words) of the purpose, methods, results, and conclusions of your research.</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.supervisor_id.label(class="form-label") }}
+                            {% if form.supervisor_id.errors %}
+                                {{ form.supervisor_id(class="form-select is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.supervisor_id.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.supervisor_id(class="form-select") }}
+                                <div class="form-text">Select your thesis supervisor from the list.</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.thesis_file.label(class="form-label") }}
+                            <div class="custom-file-upload mb-2">
+                                {{ form.thesis_file(class="d-none", onchange="updateFileName(this)") }}
+                                <label for="thesis_file" class="mb-0">
+                                    <i class="fas fa-cloud-upload-alt me-2"></i> Choose PDF File
+                                </label>
+                                <p id="file-name" class="mb-0 mt-2">No file chosen</p>
+                            </div>
+                            {% if form.thesis_file.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.thesis_file.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="form-text">Upload your thesis in PDF format (maximum size: 16MB).</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i> Submission Guidelines</h5>
+                    <ul class="mb-0">
+                        <li>Ensure your thesis follows the university's formatting guidelines.</li>
+                        <li>Your thesis must be complete and ready for examination.</li>
+                        <li>The PDF file should include all chapters, references, and appendices.</li>
+                        <li>File size must not exceed 16MB.</li>
+                        <li>After submission, your supervisor will nominate external examiners for your thesis.</li>
+                        <li>You can track the status of your thesis from your dashboard.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateFileName(input) {
+        const fileNameElement = document.getElementById('file-name');
+        if (input.files.length > 0) {
+            fileNameElement.textContent = input.files[0].name;
+        } else {
+            fileNameElement.textContent = 'No file chosen';
+        }
+    }
+</script>
+{% endblock %}

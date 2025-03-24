@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+
+{% block title %}Student Dashboard - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card role-student">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-0">Student Dashboard</h2>
+                            <p class="text-muted">Welcome, {{ current_user.first_name }} {{ current_user.last_name }}</p>
+                        </div>
+                        <a href="{{ url_for('submit_thesis') }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-2"></i> Submit New Thesis
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-primary">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h5 class="card-title">Submitted Theses</h5>
+                    <p class="display-4">{{ theses|length }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-warning">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <h5 class="card-title">Under Review</h5>
+                    <p class="display-4">{{ theses|selectattr('status', 'equalto', 'under_review')|list|length }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h5 class="card-title">Completed</h5>
+                    <p class="display-4">{{ theses|selectattr('status', 'equalto', 'completed')|list|length }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">My Theses</h5>
+                </div>
+                <div class="card-body">
+                    {% if theses %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Submission Date</th>
+                                        <th>Supervisor</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for thesis in theses %}
+                                        <tr>
+                                            <td>{{ thesis.title }}</td>
+                                            <td>{{ thesis.submission_date.strftime('%Y-%m-%d') }}</td>
+                                            <td>
+                                                {% if thesis.supervisor %}
+                                                    {{ thesis.supervisor.user.first_name }} {{ thesis.supervisor.user.last_name }}
+                                                {% else %}
+                                                    Not assigned
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if thesis.status == 'submitted' %}
+                                                    <span class="badge status-badge status-submitted">Submitted</span>
+                                                {% elif thesis.status == 'nomination_submitted' %}
+                                                    <span class="badge status-badge status-nomination">Nomination Submitted</span>
+                                                {% elif thesis.status == 'examiners_approved' %}
+                                                    <span class="badge status-badge status-approved">Examiners Approved</span>
+                                                {% elif thesis.status == 'under_review' %}
+                                                    <span class="badge status-badge status-review">Under Review</span>
+                                                {% elif thesis.status == 'completed' %}
+                                                    <span class="badge status-badge status-completed">Completed</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('thesis_status', thesis_id=thesis.id) }}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye me-1"></i> View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="display-6 text-muted mb-4">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h5>No Theses Submitted Yet</h5>
+                            <p class="text-muted">Click the "Submit New Thesis" button to get started.</p>
+                            <a href="{{ url_for('submit_thesis') }}" class="btn btn-primary mt-3">
+                                <i class="fas fa-plus-circle me-2"></i> Submit New Thesis
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

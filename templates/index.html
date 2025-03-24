@@ -1,0 +1,256 @@
+{% extends "layout.html" %}
+
+{% block title %}Student Research Management System - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4">Student Research Management System</h1>
+            <p class="lead mb-4">
+                A comprehensive platform for managing student research processes, including thesis/dissertation submissions, examiner nominations, and reviews.
+            </p>
+            <p class="mb-5">
+                Streamline the collaboration between students, lecturers/supervisors, external examiners, 
+                and the postgraduate office/committee with our integrated research management solution.
+            </p>
+            
+            {% if not current_user.is_authenticated %}
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary me-md-2 px-4 py-2">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary px-4 py-2">
+                        <i class="fas fa-user-plus me-2"></i> Register
+                    </a>
+                </div>
+            {% else %}
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary me-md-2 px-4 py-2">
+                        <i class="fas fa-tachometer-alt me-2"></i> Go to Dashboard
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-lg-6 mt-5 mt-lg-0 text-center">
+            <svg class="img-fluid" width="500" height="400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 690 500">
+                <rect x="0" y="0" width="690" height="500" fill="#212529" rx="15" ry="15" />
+                <circle cx="345" cy="250" r="220" fill="#343a40" />
+                <path d="M345 100 A150 150 0 1 0 345 400 A150 150 0 1 0 345 100" fill="#495057" />
+                <rect x="245" y="150" width="200" height="250" fill="#6c757d" rx="10" ry="10" />
+                <rect x="265" y="180" width="160" height="20" fill="#adb5bd" rx="5" ry="5" />
+                <rect x="265" y="210" width="160" height="20" fill="#adb5bd" rx="5" ry="5" />
+                <rect x="265" y="240" width="160" height="20" fill="#adb5bd" rx="5" ry="5" />
+                <rect x="265" y="270" width="160" height="20" fill="#adb5bd" rx="5" ry="5" />
+                <rect x="265" y="300" width="160" height="20" fill="#adb5bd" rx="5" ry="5" />
+                <rect x="265" y="330" width="100" height="40" fill="#0d6efd" rx="5" ry="5" />
+                <text x="315" y="355" font-family="Arial" font-size="14" text-anchor="middle" fill="white">Submit</text>
+                <circle cx="500" cy="150" r="40" fill="#0d6efd" />
+                <text x="500" y="155" font-family="Arial" font-size="14" text-anchor="middle" fill="white">PhD</text>
+                <circle cx="190" cy="150" r="40" fill="#6f42c1" />
+                <text x="190" y="155" font-family="Arial" font-size="14" text-anchor="middle" fill="white">MSc</text>
+                <path d="M345 75 L345 30 L420 30 L420 75" stroke="#ffc107" stroke-width="5" fill="none" />
+                <circle cx="345" cy="30" r="25" fill="#ffc107" />
+                <text x="345" y="35" font-family="Arial" font-size="14" text-anchor="middle" fill="#212529">🎓</text>
+            </svg>
+        </div>
+    </div>
+    
+    <hr class="my-5">
+    
+    <div class="row text-center">
+        <h2 class="mb-5">How It Works</h2>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body">
+                    <div class="display-5 mb-3 text-primary">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h5 class="card-title">Submit Research</h5>
+                    <p class="card-text">
+                        Students submit their thesis or dissertation for review by their supervisors and external examiners.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body">
+                    <div class="display-5 mb-3 text-info">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h5 class="card-title">Nominate Examiners</h5>
+                    <p class="card-text">
+                        Supervisors nominate external examiners who have the expertise to review the research.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body">
+                    <div class="display-5 mb-3 text-success">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <h5 class="card-title">Approve Nominations</h5>
+                    <p class="card-text">
+                        The postgraduate office reviews and approves examiner nominations based on qualifications.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body">
+                    <div class="display-5 mb-3 text-warning">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h5 class="card-title">Review & Feedback</h5>
+                    <p class="card-text">
+                        External examiners provide detailed feedback within a six-week timeframe.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <hr class="my-5">
+    
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <h2 class="mb-4">Key Features</h2>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 me-3 text-primary">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Multiple User Roles</h5>
+                            <p class="text-muted">
+                                Support for students, lecturers, examiners, and administrative staff.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 me-3 text-primary">
+                            <i class="fas fa-tasks fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Process Workflow</h5>
+                            <p class="text-muted">
+                                Structured workflow from submission to final review and approval.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 me-3 text-primary">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Deadline Tracking</h5>
+                            <p class="text-muted">
+                                Automatic reminders for approaching review deadlines.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0 me-3 text-primary">
+                            <i class="fas fa-bell fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Notifications</h5>
+                            <p class="text-muted">
+                                Real-time updates and email notifications for all stakeholders.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mt-4 mt-lg-0">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">User Roles</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <i class="fas fa-user-graduate text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Students</h6>
+                                    <p class="mb-0 small text-muted">Submit thesis/dissertation for review</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <i class="fas fa-chalkboard-teacher text-info"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Lecturers/Supervisors</h6>
+                                    <p class="mb-0 small text-muted">Nominate external examiners and distribute theses</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <i class="fas fa-user-tie text-warning"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">External Examiners</h6>
+                                    <p class="mb-0 small text-muted">Review and provide feedback on theses</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <i class="fas fa-university text-success"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Postgraduate Office</h6>
+                                    <p class="mb-0 small text-muted">Review and approve examiner nominations</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2 class="mb-4">Get Started Today</h2>
+            <p class="lead mb-4">
+                Join our platform to streamline your research management process and enhance collaboration.
+            </p>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-user-plus me-2"></i> Create an Account
+                </a>
+            {% else %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-tachometer-alt me-2"></i> Go to Dashboard
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

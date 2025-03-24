@@ -1,0 +1,516 @@
+{% extends "layout.html" %}
+
+{% block title %}Manage Users - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Manage Users</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card role-admin">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-0">Manage Users</h2>
+                            <p class="text-muted">View, edit, and manage system users</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="userTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">All Users</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">Students</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="lecturers-tab" data-bs-toggle="tab" data-bs-target="#lecturers" type="button" role="tab" aria-controls="lecturers" aria-selected="false">Lecturers</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="examiners-tab" data-bs-toggle="tab" data-bs-target="#examiners" type="button" role="tab" aria-controls="examiners" aria-selected="false">Examiners</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="postgrad-tab" data-bs-toggle="tab" data-bs-target="#postgrad" type="button" role="tab" aria-controls="postgrad" aria-selected="false">Postgrad Office</button>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card-body">
+                    <div class="tab-content" id="userTabsContent">
+                        <!-- All Users Tab -->
+                        <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="input-group" style="max-width: 300px;">
+                                    <input type="text" class="form-control" id="userSearchAll" placeholder="Search users...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {% if users %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Username</th>
+                                                <th>Role</th>
+                                                <th>Created</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in users %}
+                                                <tr>
+                                                    <td>{{ user.id }}</td>
+                                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.username }}</td>
+                                                    <td>
+                                                        {% if user.role == 'student' %}
+                                                            <span class="badge bg-primary">Student</span>
+                                                        {% elif user.role == 'lecturer' %}
+                                                            <span class="badge bg-info">Lecturer</span>
+                                                        {% elif user.role == 'examiner' %}
+                                                            <span class="badge bg-warning">Examiner</span>
+                                                        {% elif user.role == 'postgrad_office' %}
+                                                            <span class="badge bg-success">Postgrad Office</span>
+                                                        {% elif user.role == 'admin' %}
+                                                            <span class="badge bg-danger">Admin</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ user.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                Actions
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ user.id }}">
+                                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ user.id }}"><i class="fas fa-eye me-2"></i> View Details</a></li>
+                                                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i> Edit</a></li>
+                                                                {% if user.role != 'admin' %}
+                                                                    <li><hr class="dropdown-divider"></li>
+                                                                    <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt me-2"></i> Delete</a></li>
+                                                                {% endif %}
+                                                            </ul>
+                                                        </div>
+                                                        
+                                                        <!-- User Details Modal -->
+                                                        <div class="modal fade" id="viewUserModal{{ user.id }}" tabindex="-1" aria-labelledby="viewUserModalLabel{{ user.id }}" aria-hidden="true">
+                                                            <div class="modal-dialog modal-lg">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="viewUserModalLabel{{ user.id }}">User Details: {{ user.first_name }} {{ user.last_name }}</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <div class="row">
+                                                                            <div class="col-md-6">
+                                                                                <h6>Basic Information</h6>
+                                                                                <ul class="list-group mb-3">
+                                                                                    <li class="list-group-item d-flex justify-content-between">
+                                                                                        <span>Full Name:</span>
+                                                                                        <span>{{ user.first_name }} {{ user.last_name }}</span>
+                                                                                    </li>
+                                                                                    <li class="list-group-item d-flex justify-content-between">
+                                                                                        <span>Email:</span>
+                                                                                        <span>{{ user.email }}</span>
+                                                                                    </li>
+                                                                                    <li class="list-group-item d-flex justify-content-between">
+                                                                                        <span>Username:</span>
+                                                                                        <span>{{ user.username }}</span>
+                                                                                    </li>
+                                                                                    <li class="list-group-item d-flex justify-content-between">
+                                                                                        <span>Role:</span>
+                                                                                        <span>{{ user.role.replace('_', ' ').title() }}</span>
+                                                                                    </li>
+                                                                                    <li class="list-group-item d-flex justify-content-between">
+                                                                                        <span>Account Created:</span>
+                                                                                        <span>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <h6>Role-Specific Information</h6>
+                                                                                <ul class="list-group">
+                                                                                    {% if user.role == 'student' and user.student %}
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Student ID:</span>
+                                                                                            <span>{{ user.student.student_id }}</span>
+                                                                                        </li>
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Degree Type:</span>
+                                                                                            <span>{{ user.student.degree_type }}</span>
+                                                                                        </li>
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Department:</span>
+                                                                                            <span>{{ user.student.department }}</span>
+                                                                                        </li>
+                                                                                    {% elif user.role == 'lecturer' and user.lecturer %}
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Staff ID:</span>
+                                                                                            <span>{{ user.lecturer.staff_id }}</span>
+                                                                                        </li>
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Title:</span>
+                                                                                            <span>{{ user.lecturer.title }}</span>
+                                                                                        </li>
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Department:</span>
+                                                                                            <span>{{ user.lecturer.department }}</span>
+                                                                                        </li>
+                                                                                    {% elif user.role == 'examiner' and user.examiner %}
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Title:</span>
+                                                                                            <span>{{ user.examiner.title }}</span>
+                                                                                        </li>
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Institution:</span>
+                                                                                            <span>{{ user.examiner.institution }}</span>
+                                                                                        </li>
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Expertise:</span>
+                                                                                            <span>{{ user.examiner.expertise }}</span>
+                                                                                        </li>
+                                                                                    {% elif user.role == 'postgrad_office' and user.postgrad_office %}
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Staff ID:</span>
+                                                                                            <span>{{ user.postgrad_office.staff_id }}</span>
+                                                                                        </li>
+                                                                                        <li class="list-group-item d-flex justify-content-between">
+                                                                                            <span>Position:</span>
+                                                                                            <span>{{ user.postgrad_office.position }}</span>
+                                                                                        </li>
+                                                                                    {% endif %}
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                        <a href="#" class="btn btn-primary"><i class="fas fa-edit me-2"></i> Edit User</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pagination -->
+                                <nav aria-label="User pagination" class="mt-4">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <div class="display-6 text-muted mb-4">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <h5>No Users Found</h5>
+                                    <p class="text-muted">There are no users registered in the system.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Students Tab -->
+                        <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="input-group" style="max-width: 300px;">
+                                    <input type="text" class="form-control" id="userSearchStudents" placeholder="Search students...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {% set student_users = users|selectattr('role', 'equalto', 'student')|list %}
+                            {% if student_users %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Student ID</th>
+                                                <th>Degree</th>
+                                                <th>Department</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in student_users %}
+                                                <tr>
+                                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.student.student_id if user.student else 'N/A' }}</td>
+                                                    <td>{{ user.student.degree_type if user.student else 'N/A' }}</td>
+                                                    <td>{{ user.student.department if user.student else 'N/A' }}</td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ user.id }}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-danger">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <div class="display-6 text-muted mb-4">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <h5>No Students Found</h5>
+                                    <p class="text-muted">There are no student users registered in the system.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Lecturers Tab -->
+                        <div class="tab-pane fade" id="lecturers" role="tabpanel" aria-labelledby="lecturers-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="input-group" style="max-width: 300px;">
+                                    <input type="text" class="form-control" id="userSearchLecturers" placeholder="Search lecturers...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {% set lecturer_users = users|selectattr('role', 'equalto', 'lecturer')|list %}
+                            {% if lecturer_users %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Title</th>
+                                                <th>Staff ID</th>
+                                                <th>Department</th>
+                                                <th>Supervised Theses</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in lecturer_users %}
+                                                <tr>
+                                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.lecturer.title if user.lecturer else 'N/A' }}</td>
+                                                    <td>{{ user.lecturer.staff_id if user.lecturer else 'N/A' }}</td>
+                                                    <td>{{ user.lecturer.department if user.lecturer else 'N/A' }}</td>
+                                                    <td>
+                                                        {% if user.lecturer and user.lecturer.supervised_theses %}
+                                                            {{ user.lecturer.supervised_theses|length }}
+                                                        {% else %}
+                                                            0
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ user.id }}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-danger">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <div class="display-6 text-muted mb-4">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                    </div>
+                                    <h5>No Lecturers Found</h5>
+                                    <p class="text-muted">There are no lecturer users registered in the system.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Examiners Tab -->
+                        <div class="tab-pane fade" id="examiners" role="tabpanel" aria-labelledby="examiners-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="input-group" style="max-width: 300px;">
+                                    <input type="text" class="form-control" id="userSearchExaminers" placeholder="Search examiners...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {% set examiner_users = users|selectattr('role', 'equalto', 'examiner')|list %}
+                            {% if examiner_users %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Title</th>
+                                                <th>Institution</th>
+                                                <th>Expertise</th>
+                                                <th>Assigned Reviews</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in examiner_users %}
+                                                <tr>
+                                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.examiner.title if user.examiner else 'N/A' }}</td>
+                                                    <td>{{ user.examiner.institution if user.examiner else 'N/A' }}</td>
+                                                    <td>{{ user.examiner.expertise if user.examiner else 'N/A' }}</td>
+                                                    <td>
+                                                        {% if user.examiner and user.examiner.reviews %}
+                                                            {{ user.examiner.reviews|length }}
+                                                        {% else %}
+                                                            0
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ user.id }}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-danger">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <div class="display-6 text-muted mb-4">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                    <h5>No Examiners Found</h5>
+                                    <p class="text-muted">There are no examiner users registered in the system.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Postgrad Office Tab -->
+                        <div class="tab-pane fade" id="postgrad" role="tabpanel" aria-labelledby="postgrad-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="input-group" style="max-width: 300px;">
+                                    <input type="text" class="form-control" id="userSearchPostgrad" placeholder="Search postgrad office...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {% set postgrad_users = users|selectattr('role', 'equalto', 'postgrad_office')|list %}
+                            {% if postgrad_users %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Staff ID</th>
+                                                <th>Position</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in postgrad_users %}
+                                                <tr>
+                                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.postgrad_office.staff_id if user.postgrad_office else 'N/A' }}</td>
+                                                    <td>{{ user.postgrad_office.position if user.postgrad_office else 'N/A' }}</td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ user.id }}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-danger">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <div class="display-6 text-muted mb-4">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <h5>No Postgrad Office Users Found</h5>
+                                    <p class="text-muted">There are no postgraduate office users registered in the system.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

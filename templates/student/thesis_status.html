@@ -1,0 +1,287 @@
+{% extends "layout.html" %}
+
+{% block title %}Thesis Status - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('student_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Thesis Status</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Thesis Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3>{{ thesis.title }}</h3>
+                            <p class="text-muted">Submitted on: {{ thesis.submission_date.strftime('%B %d, %Y') }}</p>
+                            
+                            <div class="mb-4">
+                                <h5>Abstract</h5>
+                                <p>{{ thesis.abstract }}</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>Supervisor</h5>
+                                <p>
+                                    {% if thesis.supervisor %}
+                                        {{ thesis.supervisor.title }} {{ thesis.supervisor.user.first_name }} {{ thesis.supervisor.user.last_name }} 
+                                        <span class="text-muted">({{ thesis.supervisor.department }})</span>
+                                    {% else %}
+                                        Not assigned
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Status</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    {% if thesis.status == 'submitted' %}
+                                        <div class="display-6 text-primary mb-3">
+                                            <i class="fas fa-hourglass-start"></i>
+                                        </div>
+                                        <h4 class="status-badge status-submitted">Submitted</h4>
+                                        <p class="mt-2">Your thesis has been submitted and is awaiting supervisor action.</p>
+                                    {% elif thesis.status == 'nomination_submitted' %}
+                                        <div class="display-6 text-info mb-3">
+                                            <i class="fas fa-user-check"></i>
+                                        </div>
+                                        <h4 class="status-badge status-nomination">Nomination Submitted</h4>
+                                        <p class="mt-2">Your supervisor has nominated external examiners for your thesis.</p>
+                                    {% elif thesis.status == 'examiners_approved' %}
+                                        <div class="display-6 text-success mb-3">
+                                            <i class="fas fa-clipboard-check"></i>
+                                        </div>
+                                        <h4 class="status-badge status-approved">Examiners Approved</h4>
+                                        <p class="mt-2">The postgraduate office has approved examiners for your thesis.</p>
+                                    {% elif thesis.status == 'under_review' %}
+                                        <div class="display-6 text-warning mb-3">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                        <h4 class="status-badge status-review">Under Review</h4>
+                                        <p class="mt-2">Your thesis is currently being reviewed by external examiners.</p>
+                                    {% elif thesis.status == 'completed' %}
+                                        <div class="display-6 text-secondary mb-3">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <h4 class="status-badge status-completed">Completed</h4>
+                                        <p class="mt-2">The review process for your thesis has been completed.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Document</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="display-6 text-danger mb-3">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <p>{{ thesis.file_path.split('/')[-1] }}</p>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Review Progress</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <h5>Thesis Submitted</h5>
+                            <p class="text-muted">{{ thesis.submission_date.strftime('%B %d, %Y') }}</p>
+                        </div>
+                        
+                        {% if thesis.status != 'submitted' %}
+                            <div class="timeline-item">
+                                <h5>Examiner Nominations</h5>
+                                <p class="text-muted">
+                                    {% set first_nomination = nominations|first %}
+                                    {% if first_nomination %}
+                                        {{ first_nomination.nomination_date.strftime('%B %d, %Y') }}
+                                    {% else %}
+                                        Date not available
+                                    {% endif %}
+                                </p>
+                                
+                                {% if nominations %}
+                                    <div class="mt-2">
+                                        <p><strong>Nominated Examiners:</strong></p>
+                                        <ul class="list-group">
+                                            {% for nomination in nominations %}
+                                                <li class="list-group-item">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            {{ nomination.examiner.title }} {{ nomination.examiner.user.first_name }} {{ nomination.examiner.user.last_name }}
+                                                            <span class="text-muted">({{ nomination.examiner.institution }})</span>
+                                                        </div>
+                                                        <span class="badge {% if nomination.status == 'approved' %}bg-success{% elif nomination.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                            {{ nomination.status.capitalize() }}
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        {% if thesis.status in ['examiners_approved', 'under_review', 'completed'] %}
+                            <div class="timeline-item">
+                                <h5>Examiners Approved</h5>
+                                <p class="text-muted">
+                                    {% set approved_nomination = nominations|selectattr('status', 'equalto', 'approved')|first %}
+                                    {% if approved_nomination %}
+                                        Date not recorded
+                                    {% else %}
+                                        Date not available
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endif %}
+                        
+                        {% if thesis.status in ['under_review', 'completed'] %}
+                            <div class="timeline-item">
+                                <h5>Thesis Sent to Examiners</h5>
+                                <p class="text-muted">
+                                    {% set sent_nomination = nominations|selectattr('sent_date', 'defined')|first %}
+                                    {% if sent_nomination and sent_nomination.sent_date %}
+                                        {{ sent_nomination.sent_date.strftime('%B %d, %Y') }}
+                                    {% else %}
+                                        Date not available
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endif %}
+                        
+                        {% if reviews %}
+                            <div class="timeline-item">
+                                <h5>Reviews</h5>
+                                <div class="mt-2">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Examiner</th>
+                                                    <th>Status</th>
+                                                    <th>Deadline</th>
+                                                    <th>Submission</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for review in reviews %}
+                                                    <tr>
+                                                        <td>{{ review.examiner.title }} {{ review.examiner.user.first_name }} {{ review.examiner.user.last_name }}</td>
+                                                        <td>
+                                                            <span class="badge {% if review.status == 'completed' %}bg-success{% else %}bg-warning{% endif %}">
+                                                                {{ review.status.capitalize() }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            {{ review.deadline.strftime('%Y-%m-%d') }}
+                                                            {% if review.status == 'pending' %}
+                                                                <span class="deadline-counter" data-deadline="{{ review.deadline.strftime('%Y-%m-%d') }}">
+                                                                    {% set days_left = (review.deadline - now).days %}
+                                                                    {% if days_left > 0 %}
+                                                                        {{ days_left }} days left
+                                                                    {% else %}
+                                                                        Overdue
+                                                                    {% endif %}
+                                                                </span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            {% if review.submission_date %}
+                                                                {{ review.submission_date.strftime('%Y-%m-%d') }}
+                                                            {% else %}
+                                                                -
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if reviews|selectattr('status', 'equalto', 'completed')|list|length > 0 %}
+                            <div class="timeline-item">
+                                <h5>Review Feedback</h5>
+                                <div class="mt-2">
+                                    <div class="accordion" id="feedbackAccordion">
+                                        {% for review in reviews|selectattr('status', 'equalto', 'completed')|list %}
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="heading{{ review.id }}">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ review.id }}" aria-expanded="false" aria-controls="collapse{{ review.id }}">
+                                                        Feedback from {{ review.examiner.title }} {{ review.examiner.user.first_name }} {{ review.examiner.user.last_name }}
+                                                    </button>
+                                                </h2>
+                                                <div id="collapse{{ review.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ review.id }}" data-bs-parent="#feedbackAccordion">
+                                                    <div class="accordion-body">
+                                                        <div class="mb-3">
+                                                            <h6>Grade:</h6>
+                                                            <p>
+                                                                {% if review.grade == 'excellent' %}
+                                                                    <span class="badge bg-success">Excellent - Accept without changes</span>
+                                                                {% elif review.grade == 'good' %}
+                                                                    <span class="badge bg-info">Good - Accept with minor revisions</span>
+                                                                {% elif review.grade == 'acceptable' %}
+                                                                    <span class="badge bg-warning">Acceptable - Accept with major revisions</span>
+                                                                {% elif review.grade == 'poor' %}
+                                                                    <span class="badge bg-danger">Poor - Reject</span>
+                                                                {% endif %}
+                                                            </p>
+                                                        </div>
+                                                        <div>
+                                                            <h6>Comments:</h6>
+                                                            <p>{{ review.comments }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

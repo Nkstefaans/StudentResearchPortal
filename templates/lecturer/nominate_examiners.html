@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+
+{% block title %}Nominate Examiners - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('lecturer_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Nominate Examiners</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Nominate External Examiners</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h3>{{ thesis.title }}</h3>
+                            <p class="text-muted">
+                                Student: {{ thesis.student.user.first_name }} {{ thesis.student.user.last_name }} 
+                                ({{ thesis.student.degree_type }})
+                            </p>
+                            <p>{{ thesis.abstract|truncate(200) }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-info">
+                                <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i> Requirements</h5>
+                                <p class="mb-0">Please nominate {{ num_examiners }} external examiners for this {{ thesis.student.degree_type }} thesis.</p>
+                                <hr>
+                                <p class="mb-0">Examiners must be from different institutions.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('nominate_examiners', thesis_id=thesis.id) }}" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="alert alert-warning d-none" id="institution-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i> 
+                            Warning: Some selected examiners are from the same institution. Examiners must be from different institutions.
+                        </div>
+                        
+                        {% for i in range(num_examiners) %}
+                            <div class="mb-4">
+                                <label class="form-label">Examiner {{ i+1 }}</label>
+                                {% set field_name = 'examiner_' + (i+1)|string %}
+                                {% set field = form[field_name] %}
+                                
+                                {% if field.errors %}
+                                    <select name="{{ field_name }}" id="{{ field_name }}" class="form-select is-invalid">
+                                        <option value="" selected>Select an examiner</option>
+                                        {% for examiner_id, examiner_name in field.choices %}
+                                            <option value="{{ examiner_id }}" data-institution="{{ examiner_name.split('(')[-1].replace(')', '') }}">
+                                                {{ examiner_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        {% for error in field.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <select name="{{ field_name }}" id="{{ field_name }}" class="form-select">
+                                        <option value="" selected>Select an examiner</option>
+                                        {% for examiner_id, examiner_name in field.choices %}
+                                            <option value="{{ examiner_id }}" data-institution="{{ examiner_name.split('(')[-1].replace(')', '') }}">
+                                                {{ examiner_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">Select an external examiner with expertise relevant to the thesis topic.</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('lecturer_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i> Examiner Nomination Guidelines</h5>
+                    <ul class="mb-0">
+                        <li>Select {{ num_examiners }} external examiners with expertise relevant to the thesis topic.</li>
+                        <li>Ensure that all nominated examiners are from <strong>different institutions</strong>.</li>
+                        <li>Consider the examiners' qualifications and expertise in relation to the thesis research area.</li>
+                        <li>Avoid examiners with potential conflicts of interest (e.g., recent collaborators with the student or supervisor).</li>
+                        <li>The nominations will be reviewed by the postgraduate office for approval.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

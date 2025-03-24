@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Research Management System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Research Management
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                        </li>
+                        {% if current_user.role == 'student' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('submit_thesis') }}">Submit Thesis</a>
+                            </li>
+                        {% elif current_user.role == 'lecturer' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('lecturer_dashboard') }}">Supervisions</a>
+                            </li>
+                        {% elif current_user.role == 'examiner' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('examiner_dashboard') }}">Reviews</a>
+                            </li>
+                        {% elif current_user.role == 'postgrad_office' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('postgrad_dashboard') }}">Nominations</a>
+                            </li>
+                        {% elif current_user.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('manage_users') }}">Manage Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('reports') }}">Reports</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <!-- Notifications -->
+                        <li class="nav-item dropdown me-3">
+                            <a class="nav-link" href="#" id="notification-toggle" role="button" aria-expanded="false">
+                                <div class="notification-badge" {% if notifications and notifications|length > 0 %}data-count="{{ notifications|length }}"{% endif %}>
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end p-0" id="notification-menu" style="width: 300px;">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">Notifications</h6>
+                                        <a href="{{ url_for('notifications') }}" class="small">View All</a>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <ul class="list-group list-group-flush">
+                                            {% if notifications and notifications|length > 0 %}
+                                                {% for notification in notifications[:5] %}
+                                                    <li class="list-group-item" id="notification-{{ notification.id }}">
+                                                        <div class="d-flex justify-content-between">
+                                                            <div>{{ notification.message }}</div>
+                                                            <div>
+                                                                <a href="#" class="text-muted mark-notification-read" data-notification-id="{{ notification.id }}">
+                                                                    <i class="fas fa-times"></i>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="small text-muted">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+                                                    </li>
+                                                {% endfor %}
+                                            {% else %}
+                                                <li class="list-group-item text-center py-3">No new notifications</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <!-- User Menu -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i> {{ current_user.first_name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><span class="dropdown-item-text text-muted">Signed in as <strong>{{ current_user.username }}</strong></span></li>
+                                <li><span class="dropdown-item-text text-muted">Role: {{ current_user.role.replace('_', ' ').title() }}</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-2"></i> Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- Main Content -->
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Student Research Management System</h5>
+                    <p class="text-muted">
+                        A comprehensive platform for managing student research processes, 
+                        including thesis/dissertation submissions, examiner nominations, and reviews.
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('index') }}" class="text-muted">Home</a></li>
+                        <li><a href="{{ url_for('dashboard') }}" class="text-muted">Dashboard</a></li>
+                        {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('logout') }}" class="text-muted">Logout</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('login') }}" class="text-muted">Login</a></li>
+                            <li><a href="{{ url_for('register') }}" class="text-muted">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Contact</h6>
+                    <address class="text-muted">
+                        <i class="fas fa-envelope me-2"></i> support@research.edu<br>
+                        <i class="fas fa-phone me-2"></i> +1 (555) 123-4567<br>
+                        <i class="fas fa-map-marker-alt me-2"></i> University Campus<br>
+                    </address>
+                </div>
+            </div>
+            <hr class="bg-secondary">
+            <div class="text-center text-muted">
+                <small>&copy; 2023 Student Research Management System. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

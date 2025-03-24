@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+
+{% block title %}Send Thesis to Examiners - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('lecturer_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Send Thesis to Examiners</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Send Thesis to Approved Examiners</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h3>{{ thesis.title }}</h3>
+                            <p class="text-muted">
+                                Student: {{ thesis.student.user.first_name }} {{ thesis.student.user.last_name }} 
+                                ({{ thesis.student.degree_type }})
+                            </p>
+                            <p>{{ thesis.abstract|truncate(200) }}</p>
+                            
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i> 
+                                Examiner nominations have been approved by the postgraduate office. 
+                                You can now send the thesis to the approved examiners.
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Thesis Document</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="display-6 text-danger mb-3">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <p>{{ thesis.file_path.split('/')[-1] }}</p>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('send_thesis', thesis_id=thesis.id) }}" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Select Examiners to Send Thesis</label>
+                            {% if form.examiners.errors %}
+                                <div class="is-invalid">
+                                    {% for examiner_id, examiner_name in form.examiners.choices %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="examiners" id="examiner{{ examiner_id }}" value="{{ examiner_id }}">
+                                            <label class="form-check-label" for="examiner{{ examiner_id }}">
+                                                {{ examiner_name }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.examiners.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {% for examiner_id, examiner_name in form.examiners.choices %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="examiners" id="examiner{{ examiner_id }}" value="{{ examiner_id }}" checked>
+                                        <label class="form-check-label" for="examiner{{ examiner_id }}">
+                                            {{ examiner_name }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <div class="form-text">
+                                    Select the approved examiners to whom you want to send the thesis. All examiners are selected by default.
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> 
+                            <strong>Important:</strong> By sending the thesis, you are initiating the review process. 
+                            Each examiner will have 6 weeks to complete their review.
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('lecturer_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Approved Examiners</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Institution</th>
+                                    <th>Expertise</th>
+                                    <th>Nomination Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for nomination in nominations %}
+                                    <tr>
+                                        <td>{{ nomination.examiner.title }} {{ nomination.examiner.user.first_name }} {{ nomination.examiner.user.last_name }}</td>
+                                        <td>{{ nomination.examiner.institution }}</td>
+                                        <td>{{ nomination.examiner.expertise }}</td>
+                                        <td>
+                                            <span class="badge {% if nomination.status == 'approved' %}bg-success{% elif nomination.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                {{ nomination.status.capitalize() }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

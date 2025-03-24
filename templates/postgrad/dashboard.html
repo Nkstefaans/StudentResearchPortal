@@ -1,0 +1,242 @@
+{% extends "layout.html" %}
+
+{% block title %}Postgraduate Office Dashboard - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card role-postgrad">
+                <div class="card-body">
+                    <h2 class="card-title mb-0">Postgraduate Office Dashboard</h2>
+                    <p class="text-muted">Welcome, {{ current_user.first_name }} {{ current_user.last_name }} ({{ current_user.postgrad_office.position }})</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-danger">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h5 class="card-title">Pending Nominations</h5>
+                    <p class="display-4">{{ pending_nominations|length }}</p>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="#pending" class="btn btn-sm btn-primary">View All</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-warning">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <h5 class="card-title">Theses Under Review</h5>
+                    <p class="display-4">{{ theses_under_review|length }}</p>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="#inreview" class="btn btn-sm btn-primary">View All</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="postgradTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending Nominations</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="inreview-tab" data-bs-toggle="tab" data-bs-target="#inreview" type="button" role="tab" aria-controls="inreview" aria-selected="false">Theses Under Review</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="postgradTabContent">
+                        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                            {% if pending_nominations %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Thesis Title</th>
+                                                <th>Student</th>
+                                                <th>Supervisor</th>
+                                                <th>Degree</th>
+                                                <th>Nomination Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for thesis, nomination in pending_nominations %}
+                                                <tr>
+                                                    <td>{{ thesis.title }}</td>
+                                                    <td>{{ thesis.student.user.first_name }} {{ thesis.student.user.last_name }}</td>
+                                                    <td>{{ thesis.supervisor.user.first_name }} {{ thesis.supervisor.user.last_name }}</td>
+                                                    <td>{{ thesis.student.degree_type }}</td>
+                                                    <td>{{ nomination.nomination_date.strftime('%Y-%m-%d') }}</td>
+                                                    <td>
+                                                        <a href="{{ url_for('review_nominations', thesis_id=thesis.id) }}" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-clipboard-check me-1"></i> Review
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <div class="display-6 text-muted mb-4">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <h5>No Pending Nominations</h5>
+                                    <p class="text-muted">There are no examiner nominations waiting for your review at this time.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="inreview" role="tabpanel" aria-labelledby="inreview-tab">
+                            {% if theses_under_review %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Thesis Title</th>
+                                                <th>Student</th>
+                                                <th>Supervisor</th>
+                                                <th>Degree</th>
+                                                <th>Assigned Examiners</th>
+                                                <th>Review Progress</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for thesis in theses_under_review %}
+                                                <tr>
+                                                    <td>{{ thesis.title }}</td>
+                                                    <td>{{ thesis.student.user.first_name }} {{ thesis.student.user.last_name }}</td>
+                                                    <td>{{ thesis.supervisor.user.first_name }} {{ thesis.supervisor.user.last_name }}</td>
+                                                    <td>{{ thesis.student.degree_type }}</td>
+                                                    <td>
+                                                        {% set approved_nominations = thesis.nominations|selectattr('status', 'equalto', 'approved')|list %}
+                                                        {{ approved_nominations|length }}
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#progressModal{{ thesis.id }}">
+                                                            <i class="fas fa-eye me-1"></i> View Progress
+                                                        </button>
+                                                        
+                                                        <!-- Progress Modal -->
+                                                        <div class="modal fade" id="progressModal{{ thesis.id }}" tabindex="-1" aria-labelledby="progressModalLabel{{ thesis.id }}" aria-hidden="true">
+                                                            <div class="modal-dialog modal-lg">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="progressModalLabel{{ thesis.id }}">Review Progress: {{ thesis.title }}</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <div class="mb-3">
+                                                                            <h6>Student: {{ thesis.student.user.first_name }} {{ thesis.student.user.last_name }}</h6>
+                                                                            <p class="text-muted">{{ thesis.student.degree_type }} ({{ thesis.student.department }})</p>
+                                                                        </div>
+                                                                        
+                                                                        <div class="mb-3">
+                                                                            <h6>Examiner Progress:</h6>
+                                                                            <div class="table-responsive">
+                                                                                <table class="table table-bordered">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>Examiner</th>
+                                                                                            <th>Institution</th>
+                                                                                            <th>Sent Date</th>
+                                                                                            <th>Deadline</th>
+                                                                                            <th>Status</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        {% for review in thesis.reviews %}
+                                                                                            <tr>
+                                                                                                <td>{{ review.examiner.title }} {{ review.examiner.user.first_name }} {{ review.examiner.user.last_name }}</td>
+                                                                                                <td>{{ review.examiner.institution }}</td>
+                                                                                                <td>
+                                                                                                    {% set nomination = thesis.nominations|selectattr('examiner_id', 'equalto', review.examiner_id)|first %}
+                                                                                                    {% if nomination and nomination.sent_date %}
+                                                                                                        {{ nomination.sent_date.strftime('%Y-%m-%d') }}
+                                                                                                    {% else %}
+                                                                                                        -
+                                                                                                    {% endif %}
+                                                                                                </td>
+                                                                                                <td>{{ review.deadline.strftime('%Y-%m-%d') }}</td>
+                                                                                                <td>
+                                                                                                    {% if review.status == 'completed' %}
+                                                                                                        <span class="badge bg-success">Completed</span>
+                                                                                                        {% if review.grade %}
+                                                                                                            <br>
+                                                                                                            <small>
+                                                                                                                {% if review.grade == 'excellent' %}
+                                                                                                                    <span class="text-success">Excellent</span>
+                                                                                                                {% elif review.grade == 'good' %}
+                                                                                                                    <span class="text-info">Good</span>
+                                                                                                                {% elif review.grade == 'acceptable' %}
+                                                                                                                    <span class="text-warning">Acceptable</span>
+                                                                                                                {% elif review.grade == 'poor' %}
+                                                                                                                    <span class="text-danger">Poor</span>
+                                                                                                                {% endif %}
+                                                                                                            </small>
+                                                                                                        {% endif %}
+                                                                                                    {% else %}
+                                                                                                        <span class="badge bg-warning">Pending</span>
+                                                                                                        <br>
+                                                                                                        <small class="deadline-counter" data-deadline="{{ review.deadline.strftime('%Y-%m-%d') }}">
+                                                                                                            {% set days_left = (review.deadline - now).days if now is defined else 0 %}
+                                                                                                            {% if days_left > 0 %}
+                                                                                                                {{ days_left }} days left
+                                                                                                            {% else %}
+                                                                                                                <span class="text-danger">Overdue</span>
+                                                                                                            {% endif %}
+                                                                                                        </small>
+                                                                                                    {% endif %}
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        {% endfor %}
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <div class="display-6 text-muted mb-4">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <h5>No Theses Under Review</h5>
+                                    <p class="text-muted">There are no theses currently under review.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

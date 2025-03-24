@@ -1,0 +1,249 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card role-admin">
+                <div class="card-body">
+                    <h2 class="card-title mb-0">Admin Dashboard</h2>
+                    <p class="text-muted">Welcome, {{ current_user.first_name }} {{ current_user.last_name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-primary">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h5 class="card-title">Students</h5>
+                    <p class="display-4">{{ student_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-info">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h5 class="card-title">Lecturers</h5>
+                    <p class="display-4">{{ lecturer_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-warning">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h5 class="card-title">Examiners</h5>
+                    <p class="display-4">{{ examiner_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-success">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h5 class="card-title">Postgrad Office</h5>
+                    <p class="display-4">{{ postgrad_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Thesis Status Overview</h5>
+                    <a href="{{ url_for('reports') }}" class="btn btn-sm btn-primary">View Full Reports</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center mb-3">
+                                <div class="display-6 text-primary mb-2">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <h6>Submitted</h6>
+                                <h4>{{ submitted_count }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center mb-3">
+                                <div class="display-6 text-info mb-2">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <h6>Nominations</h6>
+                                <h4>{{ nomination_count }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center mb-3">
+                                <div class="display-6 text-success mb-2">
+                                    <i class="fas fa-clipboard-check"></i>
+                                </div>
+                                <h6>Approved</h6>
+                                <h4>{{ approved_count }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center mb-3">
+                                <div class="display-6 text-warning mb-2">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h6>Under Review</h6>
+                                <h4>{{ review_count }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container" style="position: relative; height:250px;">
+                        <canvas id="thesisStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">System Activity</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">New Thesis Submissions</h6>
+                                    <p class="mb-0 text-muted small">Last 30 days</p>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ submitted_count }}</span>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Pending Nominations</h6>
+                                    <p class="mb-0 text-muted small">Awaiting postgrad office review</p>
+                                </div>
+                                <span class="badge bg-warning rounded-pill">{{ nomination_count }}</span>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Active Reviews</h6>
+                                    <p class="mb-0 text-muted small">Theses currently under review</p>
+                                </div>
+                                <span class="badge bg-info rounded-pill">{{ review_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('manage_users') }}" class="btn btn-primary">
+                            <i class="fas fa-users me-2"></i> Manage Users
+                        </a>
+                        <a href="{{ url_for('reports') }}" class="btn btn-info">
+                            <i class="fas fa-chart-bar me-2"></i> View Reports
+                        </a>
+                        <button type="button" class="btn btn-secondary" onclick="alert('Feature coming soon!')">
+                            <i class="fas fa-cog me-2"></i> System Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent User Registrations</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for user in recent_users %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ user.first_name }} {{ user.last_name }}</h6>
+                                        <p class="mb-0 text-muted small">
+                                            {{ user.role.replace('_', ' ').title() }} | {{ user.email }}
+                                        </p>
+                                    </div>
+                                    <span class="text-muted small">{{ user.created_at.strftime('%Y-%m-%d') }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ url_for('manage_users') }}" class="btn btn-sm btn-primary">View All Users</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Thesis Status Chart
+        var ctx = document.getElementById('thesisStatusChart').getContext('2d');
+        var thesisStatusChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Submitted', 'Nominations', 'Approved', 'Under Review'],
+                datasets: [{
+                    label: 'Thesis Status',
+                    data: [{{ submitted_count }}, {{ nomination_count }}, {{ approved_count }}, {{ review_count }}],
+                    backgroundColor: [
+                        'rgba(13, 110, 253, 0.7)',
+                        'rgba(23, 162, 184, 0.7)',
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(255, 193, 7, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(13, 110, 253, 1)',
+                        'rgba(23, 162, 184, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

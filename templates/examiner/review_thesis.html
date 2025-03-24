@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block title %}Review Thesis - Student Research Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('examiner_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Review Thesis</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Thesis Review</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h3>{{ thesis.title }}</h3>
+                            <p class="text-muted">
+                                Student: {{ thesis.student.user.first_name }} {{ thesis.student.user.last_name }} 
+                                ({{ thesis.student.degree_type }})
+                            </p>
+                            <div class="mb-3">
+                                <h5>Abstract</h5>
+                                <p>{{ thesis.abstract }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <h5>Supervisor</h5>
+                                <p>
+                                    {% if thesis.supervisor %}
+                                        {{ thesis.supervisor.title }} {{ thesis.supervisor.user.first_name }} {{ thesis.supervisor.user.last_name }} 
+                                        <span class="text-muted">({{ thesis.supervisor.department }})</span>
+                                    {% else %}
+                                        Not assigned
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Review Deadline</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="display-6 mb-3 text-warning">
+                                        <i class="fas fa-hourglass-half"></i>
+                                    </div>
+                                    <h4>{{ review.deadline.strftime('%B %d, %Y') }}</h4>
+                                    <p class="deadline-counter" data-deadline="{{ review.deadline.strftime('%Y-%m-%d') }}">
+                                        {% set days_left = (review.deadline - now).days if now is defined else 0 %}
+                                        {% if days_left > 0 %}
+                                            {{ days_left }} days left
+                                        {% else %}
+                                            <span class="text-danger">Overdue</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Document</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="display-6 text-danger mb-3">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <p>{{ thesis.file_path.split('/')[-1] }}</p>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('review_thesis', review_id=review.id) }}" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            {{ form.grade.label(class="form-label") }}
+                            {% if form.grade.errors %}
+                                {{ form.grade(class="form-select is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.grade.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.grade(class="form-select") }}
+                                <div class="form-text">
+                                    Select the grade that best represents your assessment of the thesis.
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.comments.label(class="form-label") }}
+                            {% if form.comments.errors %}
+                                {{ form.comments(class="form-control is-invalid", rows=10) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.comments.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.comments(class="form-control", rows=10, placeholder="Provide detailed feedback on the thesis, including strengths, weaknesses, and suggestions for improvement.") }}
+                                <div class="form-text">
+                                    Provide detailed feedback including the thesis's strengths, weaknesses, methodology evaluation, and suggestions for improvement.
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i> 
+                            <strong>Important:</strong> Once submitted, your review cannot be modified. Please ensure your feedback is complete and accurate.
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('examiner_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i> Review Guidelines</h5>
+                    <ul class="mb-0">
+                        <li><strong>Excellent (Accept without changes):</strong> The thesis demonstrates exceptional quality in research, methodology, analysis, and presentation.</li>
+                        <li><strong>Good (Accept with minor revisions):</strong> The thesis is generally strong but requires minor corrections or clarifications.</li>
+                        <li><strong>Acceptable (Accept with major revisions):</strong> The thesis has merit but requires substantial improvements in certain areas.</li>
+                        <li><strong>Poor (Reject):</strong> The thesis has significant flaws in research design, methodology, or analysis that cannot be addressed through revision.</li>
+                        <li>Your feedback should be constructive, specific, and actionable for the student.</li>
+                        <li>Consider the appropriate level of expectation for the degree (Masters vs. PhD).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
