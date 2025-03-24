@@ -1,0 +1,116 @@
+Student Research Management Web Application Overview
+This web application will streamline the management of student research processes, focusing on the collaboration between students, lecturers/supervisors, external examiners, and the postgraduate office/committee. The application will handle tasks such as nomination of external examiners, review and feedback of theses/dissertations, and deadline tracking.
+
+Key Features:
+User Roles:
+
+Students: Submit their thesis or dissertation for review and feedback.
+
+Lecturers/Supervisors: Nominate and apply for external examiners, ensure alignment of research topics, and ensure that the examiners are from different institutions. They also send the final thesis/dissertation to the external examiners for review.
+
+External Examiners: Review and provide feedback on the thesis/dissertation within a six-week timeframe.
+
+Postgraduate Office/Committee: Review and approve the nominations for external examiners and send confirmations to the lecturers/supervisors.
+
+Process Flow:
+
+Lecturer/Supervisor Responsibilities:
+
+For each student, the lecturer/supervisor must nominate three (3) external examiners for a Master's student or four (4) external examiners for a PhD student.
+
+The lecturer/supervisor ensures that:
+
+The thesis/dissertation topic aligns with the expertise of the nominated external examiners.
+
+The nominated external examiners are from different institutions to avoid conflicts of interest.
+
+The lecturer/supervisor submits the nominations to the postgraduate office/committee for review and approval.
+
+Postgraduate Office/Committee Responsibilities:
+
+Review the nominations submitted by the lecturers/supervisors.
+
+Ensure that the external examiners meet the necessary qualifications and that the thesis/dissertation topics are correctly aligned.
+
+Approve or reject the nominations and send the outcome to the lecturer/supervisor.
+
+Lecturer/Supervisor After Approval:
+
+Upon approval from the postgraduate office/committee, the lecturer/supervisor sends the student’s thesis/dissertation to the external examiners.
+
+The system tracks when the thesis/dissertation is sent to each external examiner, including deadlines for review.
+
+External Examiner Responsibilities:
+
+Each external examiner has a six-week period to review the thesis/dissertation.
+
+They provide detailed feedback within the system, which is shared with the student and lecturer/supervisor.
+
+The system sends automatic reminders to external examiners every two weeks to ensure timely completion of the review.
+
+Tracking and Notifications:
+
+Time Tracking: The system tracks when each thesis/dissertation is sent to external examiners.
+
+Reminder System: Every two weeks, the system sends reminders to external examiners about the approaching review deadline to ensure timely feedback.
+
+Deadline Alerts: External examiners receive notifications as the deadline approaches, with clear information about the remaining time to complete their review.
+
+System Flow:
+Lecturer/Supervisor:
+
+Nominate 3 external examiners (for Master’s students) or 4 (for PhD students).
+
+Ensure proper alignment of topics with examiners' expertise.
+
+Submit nominations to the postgraduate office.
+
+Postgraduate Office:
+
+Review nominations from the lecturer/supervisor.
+
+Approve or reject nominations based on qualifications and topic alignment.
+
+Send approval or rejection to the lecturer/supervisor.
+
+Lecturer/Supervisor After Approval:
+
+Send the thesis/dissertation to the approved external examiners.
+
+System tracks submission dates and deadlines.
+
+External Examiners:
+
+Review the thesis/dissertation within 6 weeks.
+
+Provide feedback via the system.
+
+Receive automatic reminders every 2 weeks about the approaching deadline.
+
+System Reminders:
+
+Every 2 weeks, automatic reminders are sent to external examiners to ensure timely feedback.
+
+Reminders include deadlines and other relevant information.
+
+Additional Features:
+Admin Dashboard:
+
+For managing users (students, lecturers, external examiners, postgraduate office/committee) and overseeing all activities.
+
+Report Generation:
+
+Generate reports on nominations, approvals, and examiner feedback.
+
+Notifications:
+
+Real-time notifications for key actions (nomination submission, approval, review deadlines, etc.).
+
+Technical Requirements:
+Authentication & Authorization: Secure login for all user roles.
+
+Database: Store user information, thesis/dissertation details, examiner nominations, feedback, and deadlines.
+
+Automated Emails & Reminders: Email notifications for status updates, reminders, and deadline alerts.
+
+Responsive Design: Accessible on both desktop and mobile devices for ease of use.
