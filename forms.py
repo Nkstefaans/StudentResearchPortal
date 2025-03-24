@@ -65,7 +65,8 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('That email is already registered. Please use a different one.')
     
     def validate(self):
-        if not super().validate():
+        rv = super().validate()
+        if not rv:
             return False
         
         # Validate role-specific fields
